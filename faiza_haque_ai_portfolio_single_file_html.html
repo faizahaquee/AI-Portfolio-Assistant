@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faiza Haque · AI Portfolio Assistant</title>
+  <meta name="description" content="Chat with an AI that answers questions about Faiza Haque—UX/UI & Product Design. Projects, skills, experience, and fit for your team." />
+  <style>
+    :root{
+      --bg: #0b0f1a;
+      --card: rgba(255,255,255,.08);
+      --muted: rgba(255,255,255,.65);
+      --text: #f7f8fa;
+      --brand: #7c9cff;
+      --accent: #9ef1cf;
+      --danger: #ff7c9e;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 10% -10%, #24325a 0%, transparent 60%),
+                  radial-gradient(900px 600px at 110% 10%, #1d3e34 0%, transparent 50%),
+                  linear-gradient(180deg, #0a0e18 0%, #070a12 100%);
+      display:flex; align-items:center; justify-content:center; padding: 24px;
+    }
+    .app{
+      width: min(1100px, 100%);
+      display:grid; grid-template-rows: auto 1fr auto; gap: 16px;
+      backdrop-filter: blur(8px);
+    }
+    header{
+      display:flex; gap:16px; align-items:center; background: var(--card); padding:16px; border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .avatar{ width:52px; height:52px; border-radius:50%; background: linear-gradient(135deg, var(--brand), var(--accent)); display:grid; place-items:center; font-weight:700; color:#0b0f1a; }
+    h1{ font-size: clamp(18px, 2.6vw, 24px); margin:0; }
+    .sub{ color: var(--muted); font-size: 14px; }
+    .links{ margin-left:auto; display:flex; gap:10px; flex-wrap: wrap; }
+    .links a{ color: var(--text); text-decoration: none; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06)); padding:8px 12px; border-radius: 999px; border:1px solid rgba(255,255,255,.12); transition: transform .15s ease, background .2s ease; }
+    .links a:hover{ transform: translateY(-2px); }
+
+    .grid{ display:grid; grid-template-columns: 1fr 320px; gap:16px; }
+
+    .chat{ background: var(--card); border:1px solid rgba(255,255,255,.12); border-radius: var(--radius); box-shadow: var(--shadow); display:flex; flex-direction: column; min-height: 60vh; }
+    .messages{ padding: 18px; overflow:auto; display:flex; flex-direction:column; gap:12px; scroll-behavior: smooth; }
+    .msg{ display:flex; gap:10px; align-items:flex-start; animation: pop .2s ease; }
+    .b{ background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); padding: 12px 14px; border-radius: 14px 14px 14px 4px; max-width: 85%; line-height: 1.35; }
+    .a{ background: linear-gradient(180deg, rgba(124,156,255,.25), rgba(124,156,255,.15)); border:1px solid rgba(124,156,255,.45); padding: 12px 14px; border-radius: 14px 14px 4px 14px; margin-left:auto; max-width: 85%; }
+    .role{ width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:12px; background: #121828; border:1px solid rgba(255,255,255,.12); }
+    .role.ai{ background: linear-gradient(135deg, var(--brand), var(--accent)); color: #08101f; }
+    .typing{ display:inline-flex; gap:4px; }
+    .dot{ width:6px; height:6px; border-radius:50%; background: rgba(255,255,255,.6); animation: blink 1.2s infinite ease-in-out; }
+    .dot:nth-child(2){ animation-delay:.2s }
+    .dot:nth-child(3){ animation-delay:.4s }
+
+    @keyframes blink{ 0%,80%,100%{opacity:.2; transform: translateY(0)} 40%{opacity:1; transform: translateY(-2px)} }
+    @keyframes pop{ from{transform:translateY(6px); opacity:0} to{transform:translateY(0); opacity:1} }
+
+    .composer{ border-top:1px solid rgba(255,255,255,.12); display:flex; gap:10px; padding: 10px; }
+    .composer input{ flex:1; background: rgba(255,255,255,.06); color: var(--text); border:1px solid rgba(255,255,255,.16); border-radius: 12px; padding: 12px 14px; outline: none; }
+    .composer button{ background: linear-gradient(135deg, var(--brand), var(--accent)); color:#0b0f1a; border:none; border-radius:12px; padding: 0 14px; font-weight:700; cursor:pointer; transition: transform .12s ease; }
+    .composer button:active{ transform: translateY(1px); }
+
+    .side{ background: var(--card); border:1px solid rgba(255,255,255,.12); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; display:flex; flex-direction:column; gap:12px; }
+    .side h3{ margin: 4px 2px 0; font-size: 14px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .chip{ user-select:none; cursor:pointer; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06)); border:1px solid rgba(255,255,255,.12); padding:10px 12px; border-radius: 999px; font-size: 14px; transition: transform .12s ease, background .2s ease; }
+    .chip:hover{ transform: translateY(-2px); }
+
+    .note{ font-size:12px; color: var(--muted); line-height:1.5 }
+    .tag{ display:inline-block; font-size: 11px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); margin-right:6px; }
+
+    footer{ text-align:center; font-size:12px; color: var(--muted) }
+
+    /* Mobile */
+    @media (max-width: 880px){
+      .grid{ grid-template-columns: 1fr; }
+      .side{ order: -1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="AI portfolio assistant">
+    <header>
+      <div class="avatar" aria-hidden="true">FH</div>
+      <div>
+        <h1>Faiza Haque — Product & UX/UI Designer</h1>
+        <div class="sub">Conversational portfolio. Ask about projects, skills, experience, or company fit.</div>
+      </div>
+      <nav class="links" aria-label="Quick links">
+        <a href="mailto:faizahaquee@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/faiza-haque/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.canva.com/design/DAGoNIZjwHU/Ebv4RzyhZVq1sliqtzJyRw/view?utm_content=DAGoNIZjwHU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h09c86b55bd" target="_blank" rel="noopener">Indigo Case Study</a>
+      </nav>
+    </header>
+
+    <div class="grid">
+      <section class="chat" aria-label="Chat">
+        <div id="messages" class="messages" aria-live="polite" aria-relevant="additions"></div>
+        <div class="composer">
+          <input id="input" type="text" placeholder="Ask about Faiza’s roles, projects, skills, or fit…" autocomplete="off" />
+          <button id="send" aria-label="Send">Send ⮕</button>
+        </div>
+      </section>
+
+      <aside class="side" aria-label="Suggestions and highlights">
+        <h3>Suggested questions</h3>
+        <div id="chips" class="chips"></div>
+        <h3>Focus areas</h3>
+        <div>
+          <span class="tag">Product Design</span>
+          <span class="tag">UX/UI</span>
+          <span class="tag">Interaction Design</span>
+          <span class="tag">Accessibility (WCAG)</span>
+          <span class="tag">Prototyping</span>
+          <span class="tag">Research & Workshops</span>
+        </div>
+        <p class="note">This assistant uses on-page logic—no data is sent to a server. Answers are based on Faiza’s real background and projects.</p>
+      </aside>
+    </div>
+
+    <footer>© <span id="year"></span> Faiza Haque</footer>
+  </div>
+
+  <script>
+  const state = {
+    // Canonical facts used in responses (sourced from resume & case study)
+    profile: {
+      name: "Faiza Haque",
+      title: "Product & UX/UI Designer",
+      email: "faizahaquee@gmail.com",
+      links: {
+        linkedin: "https://www.linkedin.com/in/faiza-haque/",
+        indigo: "https://www.canva.com/design/DAGoNIZjwHU/Ebv4RzyhZVq1sliqtzJyRw/view?utm_content=DAGoNIZjwHU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h09c86b55bd"
+      },
+      education: [
+        { school: "University of Waterloo", program: "Master of Digital Experience Innovation", dates: "Sep 2025 – Jun 2026" },
+        { school: "University of Toronto Mississauga", program: "BA (Hons) — CCIT & Political Science", dates: "2020 – 2024" },
+        { school: "Sheridan College", program: "Certificate — Digital Communications & Multimedia", dates: "2020 – 2024" }
+      ],
+      skills: {
+        design: ["Figma","Adobe XD","Balsamiq","Systems Thinking","Prototyping","Interaction Design","Data Visualization","Miro","HTML/CSS"],
+        marketing: ["Google Analytics","Meta Ads Manager","Adobe Creative Suite","Canva","Hootsuite","Mailchimp","WordPress","Photography"],
+        comms: ["Team Leadership","Stakeholder Communication","Project Management","Event Support","Project Planning","Digital Marketing","Copywriting","Report Preparation"],
+        accessibility: ["WCAG-focused design","Accessibility testing"]
+      },
+      experience: [
+        { role: "Freelance Brand Designer", org: "City of Toronto", dates: "Jan – Mar 2024", impact: ["Delivered final logo assets across channels with consistent UX","Collaborated with the Board Chair and stakeholders to iterate on designs"] },
+        { role: "Communications Coordinator", org: "Fife House", dates: "May 2022 – Mar 2024", impact: ["Improved website/newsletter UX (navigation, typography, responsiveness)","Integrated accessibility testing to meet WCAG","Led multi-platform campaigns; +8.5% growth QoQ"] },
+        { role: "Media Productions Director & Creative Director", org: "ICCIT Council, UTM", dates: "May 2021 – Mar 2023", impact: ["Led 2 workshops: Illustrator (60+ online) & InDesign (40+ in-person)","Recruited and led a volunteer media team; managed schedules for events and content"] }
+      ],
+      projects: {
+        indigo: {
+          name: "Custom Book Club Feature for Indigo (Mobile)", month: "May 2025",
+          summary: "A product + marketing concept to boost engagement, retention, and community through personalized, social reading.",
+          link: "https://www.canva.com/design/DAGoNIZjwHU/Ebv4RzyhZVq1sliqtzJyRw/view?utm_content=DAGoNIZjwHU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h09c86b55bd",
+          highlights: [
+            "Personalized clubs with recommendations and lightweight social features",
+            "Hypothesized KPI lifts in MAU/retention through habit loops and community",
+            "End-to-end flows: onboarding, discovery, club creation, event planning"
+          ]
+        }
+      },
+      targets: {
+        roles: ["UX/UI Designer","Product Designer","UX Researcher"],
+        companies: ["Indigo","Shopify","Rakuten Kobo","Wealthsimple","Loblaw Digital","TELUS Digital","City of Toronto","Ontario Digital Service","Hootsuite","Wattpad"]
+      }
+    }
+  };
+
+  const SUGGESTIONS = [
+    "What roles are you targeting and why?",
+    "Tell me about your Indigo Book Club project",
+    "What skills and tools do you use most?",
+    "Walk me through your experience highlights",
+    "Why are you a good fit for an e‑commerce company?",
+    "How do you approach accessibility?",
+    "What impact did you have at Fife House?",
+    "Why product design vs. just UI?",
+    "Who are some companies you’re excited about?"
+  ];
+
+  // Intent patterns (very lightweight, client‑only)
+  const INTENTS = [
+    { key: 'roles', test: /roles?|positions?|jobs?|target|interested|why product design|why ux\/ui|why ux researcher/i, handler: answerRoles },
+    { key: 'projects', test: /project|case study|indigo|book club|work example|portfolio/i, handler: answerProjects },
+    { key: 'skills', test: /skills?|tools?|stack|experience|background|what can you do|capabilit/i, handler: answerSkills },
+    { key: 'fit', test: /why.*fit|fit for|good (addition|fit)|why hire|company type|industry|e-?commerce|retail|public sector|gov|fintech|media|health/i, handler: answerFit },
+    { key: 'accessibility', test: /accessibility|wcag|a11y/i, handler: answerAccessibility },
+    { key: 'experience', test: /experience|work history|toronto|fife house|iccit|workshops?/i, handler: answerExperience },
+    { key: 'companies', test: /companies|where.*work|who.*excited|interested in companies/i, handler: answerCompanies },
+  ];
+
+  // --- Rendering helpers ---
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('input');
+  const sendEl = document.getElementById('send');
+  const chipsEl = document.getElementById('chips');
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function addMsg(text, role='ai'){
+    const row = document.createElement('div');
+    row.className = 'msg';
+    const badge = document.createElement('div');
+    badge.className = 'role ' + (role==='ai' ? 'ai' : '');
+    badge.textContent = role==='ai' ? 'AI' : 'You';
+
+    const bubble = document.createElement('div');
+    bubble.className = role==='ai' ? 'b' : 'a';
+    bubble.innerHTML = text;
+
+    row.appendChild(badge);
+    row.appendChild(bubble);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function addTyping(){
+    const row = document.createElement('div');
+    row.className = 'msg typingRow';
+    const badge = document.createElement('div');
+    badge.className = 'role ai'; badge.textContent = 'AI';
+    const bubble = document.createElement('div');
+    bubble.className = 'b';
+    bubble.innerHTML = '<span class="typing" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span><span class="sr-only">Typing…</span>';
+    row.appendChild(badge); row.appendChild(bubble);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+  function removeTyping(){
+    const t = document.querySelector('.typingRow');
+    if(t) t.remove();
+  }
+
+  function send(text){
+    if(!text) return; 
+    addMsg(escapeHtml(text), 'you');
+    inputEl.value = '';
+    addTyping();
+    setTimeout(()=>{
+      const ans = route(text);
+      removeTyping();
+      addMsg(ans, 'ai');
+    }, 550);
+  }
+
+  function route(q){
+    const lower = q.toLowerCase();
+    const found = INTENTS.find(i => i.test.test(lower));
+    if(found) return found.handler(lower);
+    // fallback
+    return answerGeneral(lower);
+  }
+
+  // --- Intent handlers ---
+  function answerRoles(){
+    const roles = state.profile.targets.roles.join(', ');
+    return `I’m focused on <strong>${roles}</strong>. I’m drawn to these roles because they sit where user needs, product strategy, and crisp execution meet. My background blends hands‑on design (Figma prototyping, interaction design, HTML/CSS) with <em>communication and research</em>—I’ve led workshops, simplified complex ideas, and shipped brand and marketing UX work. That mix helps me move from insights → flows → polished UI quickly while keeping stakeholders aligned.`
+  }
+
+  function answerProjects(){
+    const p = state.profile.projects.indigo;
+    return `Here’s a quick overview of my recent case study: <strong>${p.name}</strong> (${p.month}).<br><br>
+      ${p.summary}<br><br>
+      Highlights:
+      <ul>
+        ${p.highlights.map(h=>`<li>${h}</li>`).join('')}
+      </ul>
+      You can browse the full flow here: <a href="${p.link}" target="_blank" rel="noopener">Indigo Book Club — walkthrough</a>.`;
+  }
+
+  function answerSkills(){
+    const s = state.profile.skills;
+    return `Core skills & tools I use day‑to‑day:
+      <ul>
+        <li><strong>Design/UX:</strong> ${s.design.join(', ')}</li>
+        <li><strong>Research & Facilitation:</strong> planning studies, synthesis, stakeholder readouts, student workshops (60+ online / 40+ in‑person)</li>
+        <li><strong>Accessibility:</strong> ${s.accessibility.join(', ')}</li>
+        <li><strong>Marketing & Analytics:</strong> ${s.marketing.join(', ')}</li>
+        <li><strong>Communication & Ops:</strong> ${s.comms.join(', ')}</li>
+      </ul>
+      Recently, I’ve been applying <em>systems thinking</em> to connect feature‑level decisions to measurable outcomes like engagement and retention.`
+  }
+
+  function answerExperience(){
+    const e = state.profile.experience;
+    return `<strong>Recent experience snapshots</strong>
+      <ul>
+        <li><strong>${e[0].role} — ${e[0].org}</strong> (${e[0].dates}): ${e[0].impact[0]}; ${e[0].impact[1]}.</li>
+        <li><strong>${e[1].role} — ${e[1].org}</strong> (${e[1].dates}): ${e[1].impact[0]}; ${e[1].impact[1]}; ran multi‑platform campaigns with <strong>+8.5% growth QoQ</strong>.</li>
+        <li><strong>${e[2].role} — ${e[2].org}</strong> (${e[2].dates}): led Illustrator (60+ online) & InDesign (40+ in‑person) workshops; built and led a production team.</li>
+      </ul>
+      Education includes the University of Waterloo (MDXi, 2025–2026) and UTM (BA Hons, 2020–2024).`;
+  }
+
+  function answerAccessibility(){
+    return `Accessibility is a first‑class constraint for me. In prior work I integrated <strong>WCAG‑aligned testing</strong> and improved typography, navigation, and responsiveness across devices. My approach: start with semantic structure, ensure contrast/scale, test with keyboard & screen‑reader paths, and include alt, labels, and clear focus states in prototypes.`
+  }
+
+  function answerCompanies(){
+    const c = state.profile.targets.companies;
+    return `I’m excited about <strong>${c.slice(0,5).join(', ')}</strong> and also <strong>${c.slice(5).join(', ')}</strong>. They’re great fits for my interests across retail/e‑commerce, fintech, media/community, and public‑sector digital services.`
+  }
+
+  function answerFit(q){
+    const map = [
+      { k:/fintech|finance|wealth/i, msg: `For a <strong>fintech</strong> team, I bring crisp interface design and clear communication that builds trust—critical for complex flows (onboarding, KYC, payments). I pair systems thinking with data literacy (Google Analytics) to move from hypotheses → tests that improve activation and retention.`},
+      { k:/e-?commerce|retail|shop|indigo|kobo/i, msg: `In <strong>e‑commerce/retail</strong>, my Indigo case study shows how social reading loops can boost habit formation and LTV. I’m comfortable designing personalized discovery, collection management, and community features that ladder to MAU/retention.`},
+      { k:/public|gov|municipal|city|ontario/i, msg: `For the <strong>public sector</strong>, I’ve delivered brand/design work with the City of Toronto and prioritize accessibility and clarity. I work well with multi‑stakeholder governance and can translate policy and research into inclusive, actionably simple interfaces.`},
+      { k:/media|community|social|content|wattpad|spotify|cbc|hootsuite/i, msg: `For <strong>media/community</strong> products, I’ve led workshops and content operations, which helps me design features that encourage expression and sustained engagement while staying accessible.`},
+      { k:/health|non[- ]?profit|fife/i, msg: `For <strong>health & non‑profit</strong> contexts, I’ve improved UX across web/newsletters at Fife House and integrated WCAG testing—balancing impact with resource constraints.`}
+    ];
+    const m = map.find(x=>x.k.test(q));
+    return (m?.msg || `I map product goals to the user journey: research → flows → prototypes → accessible UI. My communication background helps align stakeholders, and my marketing/analytics experience helps tie features to KPIs (activation, engagement, retention). Ask about a specific industry and I’ll tailor further.`);
+  }
+
+  function answerGeneral(){
+    return `I’m Faiza—nice to meet you! You can ask about my <em>roles</em>, <em>projects</em> (like the Indigo Book Club feature), <em>skills</em>, <em>experience</em>, or my <em>fit</em> for a specific company type (e.g., fintech, e‑commerce, public sector). Or pick a suggested question →`;
+  }
+
+  // --- Utilities ---
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#039;'}[m]));
+  }
+
+  function seed(){
+    addMsg("Hi! I’m Faiza’s AI portfolio. How can I help? Try a suggestion on the right, or ask anything about roles, projects, skills, experience, or company fit.");
+    SUGGESTIONS.forEach(s=>{
+      const c = document.createElement('button');
+      c.className='chip'; c.type='button'; c.textContent = s;
+      c.addEventListener('click', ()=> send(s));
+      chipsEl.appendChild(c);
+    })
+  }
+
+  // Events
+  sendEl.addEventListener('click', ()=> send(inputEl.value.trim()));
+  inputEl.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter') send(inputEl.value.trim());
+  });
+
+  // Init
+  seed();
+  </script>
+</body>
+</html>
